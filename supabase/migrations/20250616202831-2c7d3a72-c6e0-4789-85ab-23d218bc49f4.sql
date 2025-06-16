@@ -1,4 +1,3 @@
-
 -- Create profiles table for users
 CREATE TABLE public.profiles (
   id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
@@ -32,10 +31,30 @@ CREATE TABLE public.transactions (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
+-- Add a table for recurring transactions
+CREATE TABLE public.recurring_transactions (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+  amount DECIMAL(12,2) NOT NULL,
+  description TEXT NOT NULL,
+  category_id UUID NOT NULL REFERENCES public.categories ON DELETE RESTRICT,
+  type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
+  frequency TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'yearly')),
+  start_date DATE NOT NULL,
+  end_date DATE,
+  next_date DATE NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
 -- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
+
+-- Enable RLS for recurring transactions
+ALTER TABLE public.recurring_transactions ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for profiles
 CREATE POLICY "Users can view own profile" ON public.profiles
@@ -63,6 +82,74 @@ CREATE POLICY "Users can update own transactions" ON public.transactions
 
 CREATE POLICY "Users can delete own transactions" ON public.transactions
   FOR DELETE USING (auth.uid() = user_id);
+
+-- RLS Policies for recurring transactions
+CREATE POLICY "Users can view own recurring transactions" ON public.recurring_transactions
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own recurring transactions" ON public.recurring_transactions
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own recurring transactions" ON public.recurring_transactions
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own recurring transactions" ON public.recurring_transactions
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Function to calculate next occurrence date (fixed parameter name)
+CREATE OR REPLACE FUNCTION calculate_next_date(input_date DATE, frequency TEXT)
+RETURNS DATE AS $$
+BEGIN
+  CASE frequency
+    WHEN 'daily' THEN
+      RETURN input_date + INTERVAL '1 day';
+    WHEN 'weekly' THEN
+      RETURN input_date + INTERVAL '1 week';
+    WHEN 'monthly' THEN
+      RETURN input_date + INTERVAL '1 month';
+    WHEN 'yearly' THEN
+      RETURN input_date + INTERVAL '1 year';
+    ELSE
+      RETURN input_date;
+  END CASE;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to create transactions from recurring ones
+CREATE OR REPLACE FUNCTION process_recurring_transactions()
+RETURNS void AS $$
+DECLARE
+  rec RECORD;
+BEGIN
+  FOR rec IN 
+    SELECT * FROM public.recurring_transactions 
+    WHERE is_active = true 
+    AND next_date <= CURRENT_DATE
+    AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+  LOOP
+    -- Insert the transaction
+    INSERT INTO public.transactions (
+      user_id, amount, description, category_id, type, date
+    ) VALUES (
+      rec.user_id, rec.amount, rec.description, rec.category_id, rec.type, rec.next_date
+    );
+    
+    -- Update next_date
+    UPDATE public.recurring_transactions 
+    SET 
+      next_date = calculate_next_date(rec.next_date, rec.frequency),
+      updated_at = now()
+    WHERE id = rec.id;
+    
+    -- Deactivate if past end_date
+    IF rec.end_date IS NOT NULL AND calculate_next_date(rec.next_date, rec.frequency) > rec.end_date THEN
+      UPDATE public.recurring_transactions 
+      SET is_active = false, updated_at = now()
+      WHERE id = rec.id;
+    END IF;
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 -- Insert default categories
 INSERT INTO public.categories (name, type, icon, color) VALUES

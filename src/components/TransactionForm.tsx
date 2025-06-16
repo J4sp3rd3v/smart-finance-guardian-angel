@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, MinusCircle, Calendar } from 'lucide-react';
+import { PlusCircle, MinusCircle, Calendar, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import SmartDescriptionInput from './SmartDescriptionInput';
 
 interface Category {
   id: string;
@@ -20,9 +21,10 @@ interface Category {
 
 interface TransactionFormProps {
   onSuccess: () => void;
+  onShowRecurring?: () => void;
 }
 
-const TransactionForm = ({ onSuccess }: TransactionFormProps) => {
+const TransactionForm = ({ onSuccess, onShowRecurring }: TransactionFormProps) => {
   const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -172,10 +174,15 @@ const TransactionForm = ({ onSuccess }: TransactionFormProps) => {
                 <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Descrizione
                 </label>
-                <Input
-                  placeholder="Es: Spesa al supermercato"
+                <SmartDescriptionInput
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, description: value })}
+                  categoryId={formData.categoryId}
+                  placeholder={
+                    transactionType === 'expense' 
+                      ? "Es: Benzina moto, Spesa supermercato, Bolletta luce"
+                      : "Es: Stipendio gennaio, Vendita auto, Rimborso assicurazione"
+                  }
                   required
                 />
               </div>
@@ -214,6 +221,32 @@ const TransactionForm = ({ onSuccess }: TransactionFormProps) => {
                 {loading ? 'Aggiunta...' : `Aggiungi ${transactionType === 'income' ? 'Entrata' : 'Uscita'}`}
               </Button>
             </form>
+
+            {/* Link ai pagamenti ricorrenti */}
+            {onShowRecurring && (
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium text-blue-800 mb-1">
+                      Pagamenti Ricorrenti
+                    </h4>
+                    <p className="text-xs text-blue-600">
+                      Configura mutui, stipendi, bollette e altri pagamenti automatici
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={onShowRecurring}
+                    className="text-blue-700 border-blue-300 hover:bg-blue-100"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Gestisci
+                  </Button>
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>
