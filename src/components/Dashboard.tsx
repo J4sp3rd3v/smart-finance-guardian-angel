@@ -1,44 +1,120 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown, Wallet, PlusCircle, MinusCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Wallet, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FinancialChart from './FinancialChart';
 import TransactionList from './TransactionList';
-import QuickActions from './QuickActions';
+import TransactionForm from './TransactionForm';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Stats {
+  totalBalance: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  savingsRate: number;
+}
 
 const Dashboard = () => {
-  const stats = [
+  const { user, signOut } = useAuth();
+  const [stats, setStats] = useState<Stats>({
+    totalBalance: 0,
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    savingsRate: 0,
+  });
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      fetchStats();
+    }
+  }, [user, refreshKey]);
+
+  const fetchStats = async () => {
+    try {
+      const currentMonth = new Date().getMonth() + 1;
+      const currentYear = new Date().getFullYear();
+
+      // Fetch all transactions for total balance
+      const { data: allTransactions } = await supabase
+        .from('transactions')
+        .select('amount, type')
+        .eq('user_id', user?.id);
+
+      // Fetch current month transactions
+      const { data: monthlyTransactions } = await supabase
+        .from('transactions')
+        .select('amount, type')
+        .eq('user_id', user?.id)
+        .gte('date', `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`)
+        .lt('date', `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-01`);
+
+      if (allTransactions) {
+        const totalBalance = allTransactions.reduce((acc, transaction) => {
+          return transaction.type === 'income' 
+            ? acc + transaction.amount 
+            : acc - transaction.amount;
+        }, 0);
+
+        const monthlyIncome = monthlyTransactions?.reduce((acc, transaction) => {
+          return transaction.type === 'income' ? acc + transaction.amount : acc;
+        }, 0) || 0;
+
+        const monthlyExpenses = monthlyTransactions?.reduce((acc, transaction) => {
+          return transaction.type === 'expense' ? acc + transaction.amount : acc;
+        }, 0) || 0;
+
+        const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100 : 0;
+
+        setStats({
+          totalBalance,
+          monthlyIncome,
+          monthlyExpenses,
+          savingsRate,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const handleTransactionSuccess = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const statsData = [
     {
-      title: "Total Balance",
-      amount: "$12,345.67",
-      change: "+12.5%",
-      trend: "up",
+      title: "Saldo Totale",
+      amount: `€${stats.totalBalance.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`,
+      change: stats.totalBalance >= 0 ? "Positivo" : "Negativo",
+      trend: stats.totalBalance >= 0 ? "up" : "down",
       icon: Wallet,
       gradient: "from-blue-500 to-cyan-500"
     },
     {
-      title: "Monthly Income",
-      amount: "$4,250.00",
-      change: "+8.2%",
+      title: "Entrate Mensili",
+      amount: `€${stats.monthlyIncome.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`,
+      change: "Questo mese",
       trend: "up",
       icon: TrendingUp,
       gradient: "from-green-500 to-emerald-500"
     },
     {
-      title: "Monthly Expenses",
-      amount: "$2,890.43",
-      change: "-3.1%",
+      title: "Uscite Mensili",
+      amount: `€${stats.monthlyExpenses.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`,
+      change: "Questo mese",
       trend: "down",
       icon: TrendingDown,
       gradient: "from-orange-500 to-red-500"
     },
     {
-      title: "Savings Rate",
-      amount: "32%",
-      change: "+5.2%",
-      trend: "up",
-      icon: PlusCircle,
+      title: "Tasso di Risparmio",
+      amount: `${stats.savingsRate.toFixed(1)}%`,
+      change: "Questo mese",
+      trend: stats.savingsRate > 0 ? "up" : "down",
+      icon: DollarSign,
       gradient: "from-purple-500 to-pink-500"
     }
   ];
@@ -50,27 +126,25 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
-              Welcome back, John! 👋
+              Ciao, {user?.user_metadata?.full_name || user?.email}! 👋
             </h1>
             <p className="text-slate-600 mt-1">
-              Here's your financial overview for today
+              Ecco la panoramica delle tue finanze
             </p>
           </div>
-          <div className="flex gap-3">
-            <Button size="sm" variant="outline" className="hover:scale-105 transition-transform">
-              <MinusCircle className="h-4 w-4 mr-2" />
-              Add Expense
-            </Button>
-            <Button size="sm" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:scale-105 transition-all">
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add Income
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            onClick={signOut}
+            className="hover:scale-105 transition-transform"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Esci
+          </Button>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {stats.map((stat, index) => (
+          {statsData.map((stat, index) => (
             <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -109,7 +183,7 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-blue-600" />
-                  Financial Overview
+                  Panoramica Finanziaria
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -118,15 +192,16 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Quick Actions */}
+          {/* Transaction Form and List */}
           <div className="space-y-6">
-            <QuickActions />
+            <TransactionForm onSuccess={handleTransactionSuccess} />
+            
             <Card className="border-0 shadow-lg">
               <CardHeader>
-                <CardTitle>Recent Transactions</CardTitle>
+                <CardTitle>Transazioni Recenti</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <TransactionList />
+                <TransactionList key={refreshKey} />
               </CardContent>
             </Card>
           </div>

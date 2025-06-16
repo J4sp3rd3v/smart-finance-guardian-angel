@@ -1,97 +1,135 @@
 
-import React from 'react';
-import { ArrowUpRight, ArrowDownLeft, Coffee, Car, Home, ShoppingBag, Utensils } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowUpRight, ArrowDownLeft, Trash2, Edit } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/hooks/use-toast';
+
+interface Transaction {
+  id: string;
+  amount: number;
+  description: string;
+  type: string;
+  date: string;
+  categories: {
+    name: string;
+    color: string;
+  };
+}
 
 const TransactionList = () => {
-  const transactions = [
-    {
-      id: 1,
-      type: 'expense',
-      amount: 24.50,
-      description: 'Coffee Shop',
-      category: 'Food & Dining',
-      date: '2024-01-15',
-      icon: Coffee,
-      color: 'text-amber-600 bg-amber-100'
-    },
-    {
-      id: 2,
-      type: 'income',
-      amount: 2500.00,
-      description: 'Salary Deposit',
-      category: 'Income',
-      date: '2024-01-15',
-      icon: ArrowUpRight,
-      color: 'text-green-600 bg-green-100'
-    },
-    {
-      id: 3,
-      type: 'expense',
-      amount: 89.99,
-      description: 'Grocery Shopping',
-      category: 'Groceries',
-      date: '2024-01-14',
-      icon: ShoppingBag,
-      color: 'text-blue-600 bg-blue-100'
-    },
-    {
-      id: 4,
-      type: 'expense',
-      amount: 45.00,
-      description: 'Gas Station',
-      category: 'Transportation',
-      date: '2024-01-14',
-      icon: Car,
-      color: 'text-purple-600 bg-purple-100'
-    },
-    {
-      id: 5,
-      type: 'expense',
-      amount: 120.00,
-      description: 'Internet Bill',
-      category: 'Utilities',
-      date: '2024-01-13',
-      icon: Home,
-      color: 'text-orange-600 bg-orange-100'
-    },
-    {
-      id: 6,
-      type: 'expense',
-      amount: 32.75,
-      description: 'Restaurant',
-      category: 'Food & Dining',
-      date: '2024-01-13',
-      icon: Utensils,
-      color: 'text-red-600 bg-red-100'
+  const { user } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchTransactions();
     }
-  ];
+  }, [user]);
+
+  const fetchTransactions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          *,
+          categories (
+            name,
+            color
+          )
+        `)
+        .eq('user_id', user?.id)
+        .order('date', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setTransactions(data || []);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteTransaction = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Transazione eliminata",
+        description: "La transazione è stata eliminata con successo",
+      });
+
+      fetchTransactions();
+    } catch (error: any) {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const formatAmount = (amount: number, type: string) => {
-    const formatted = amount.toLocaleString('en-US', {
+    const formatted = amount.toLocaleString('it-IT', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'EUR'
     });
     return type === 'income' ? `+${formatted}` : `-${formatted}`;
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('it-IT', { 
+      day: 'numeric',
+      month: 'short' 
     });
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
+        ))}
+      </div>
+    );
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>Nessuna transazione ancora.</p>
+        <p className="text-sm">Aggiungi la tua prima entrata o uscita!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-1">
       {transactions.map((transaction) => (
         <div
           key={transaction.id}
-          className="flex items-center gap-3 p-4 hover:bg-slate-50 transition-colors cursor-pointer group"
+          className="flex items-center gap-3 p-4 hover:bg-slate-50 transition-colors group"
         >
-          {/* Icon */}
-          <div className={`p-2 rounded-lg ${transaction.color} group-hover:scale-110 transition-transform`}>
-            <transaction.icon className="h-4 w-4" />
+          {/* Amount */}
+          <div className={`p-2 rounded-lg ${
+            transaction.type === 'income' 
+              ? 'text-green-600' 
+              : 'text-red-600'
+          }`}>
+            {transaction.type === 'income' ? (
+              <ArrowUpRight className="h-4 w-4" />
+            ) : (
+              <ArrowDownLeft className="h-4 w-4" />
+            )}
           </div>
 
           {/* Transaction Details */}
@@ -110,7 +148,7 @@ const TransactionList = () => {
             </div>
             <div className="flex items-center justify-between mt-1">
               <p className="text-sm text-slate-500">
-                {transaction.category}
+                {transaction.categories.name}
               </p>
               <p className="text-xs text-slate-400">
                 {formatDate(transaction.date)}
@@ -118,27 +156,19 @@ const TransactionList = () => {
             </div>
           </div>
 
-          {/* Transaction Type Indicator */}
-          <div className={`p-1 rounded-full ${
-            transaction.type === 'income' 
-              ? 'text-green-600' 
-              : 'text-red-600'
-          }`}>
-            {transaction.type === 'income' ? (
-              <ArrowUpRight className="h-3 w-3" />
-            ) : (
-              <ArrowDownLeft className="h-3 w-3" />
-            )}
+          {/* Actions */}
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => deleteTransaction(transaction.id)}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       ))}
-      
-      {/* View All Button */}
-      <div className="p-4 border-t border-slate-100">
-        <button className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium py-2 hover:bg-blue-50 rounded-lg transition-colors">
-          View All Transactions
-        </button>
-      </div>
     </div>
   );
 };

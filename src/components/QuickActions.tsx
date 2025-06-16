@@ -7,32 +7,18 @@ import { PlusCircle, MinusCircle, Target, PieChart, Receipt, Smartphone } from '
 const QuickActions = () => {
   const actions = [
     {
-      title: "Add Income",
-      description: "Record new income",
-      icon: PlusCircle,
-      color: "bg-green-500 hover:bg-green-600",
-      action: () => console.log("Add income clicked")
-    },
-    {
-      title: "Add Expense",
-      description: "Track new expense",
-      icon: MinusCircle,
-      color: "bg-red-500 hover:bg-red-600",
-      action: () => console.log("Add expense clicked")
-    },
-    {
-      title: "Set Budget",
-      description: "Create spending limits",
-      icon: Target,
-      color: "bg-blue-500 hover:bg-blue-600",
-      action: () => console.log("Set budget clicked")
-    },
-    {
-      title: "View Reports",
-      description: "Analyze spending patterns",
+      title: "Visualizza Report",
+      description: "Analizza i tuoi pattern di spesa",
       icon: PieChart,
       color: "bg-purple-500 hover:bg-purple-600",
       action: () => console.log("View reports clicked")
+    },
+    {
+      title: "Imposta Budget",
+      description: "Crea limiti di spesa",
+      icon: Target,
+      color: "bg-blue-500 hover:bg-blue-600",
+      action: () => console.log("Set budget clicked")
     }
   ];
 
@@ -41,7 +27,7 @@ const QuickActions = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Smartphone className="h-5 w-5 text-blue-600" />
-          Quick Actions
+          Azioni Rapide
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -65,14 +51,15 @@ const QuickActions = () => {
         <div className="pt-4 border-t border-slate-100">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <Receipt className="h-4 w-4" />
-            <span>or scan a receipt</span>
+            <span>Funzioni future</span>
           </div>
           <Button 
             variant="outline" 
             size="sm" 
             className="w-full mt-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+            disabled
           >
-            Scan Receipt
+            Scansione Scontrini
           </Button>
         </div>
       </CardContent>
