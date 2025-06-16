@@ -208,7 +208,7 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <FinancialChart />
+                <FinancialChart key={refreshKey} />
               </CardContent>
             </Card>
           </TabsContent>
