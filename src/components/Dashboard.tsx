@@ -177,56 +177,94 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Chart Section */}
-          <div className="lg:col-span-2">
+        {/* Navigation Tabs */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto mb-8">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Panoramica
+            </TabsTrigger>
+            <TabsTrigger value="transactions" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Transazioni
+            </TabsTrigger>
+            <TabsTrigger value="recurring" className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Ricorrenti
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <Wallet className="h-4 w-4" />
+              Cronologia
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
             <Card className="border-0 shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-blue-600" />
-                  Panoramica Finanziaria
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <DollarSign className="h-6 w-6 text-blue-600" />
+                  Andamento Finanziario
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <FinancialChart />
               </CardContent>
             </Card>
-          </div>
-
-          {/* Transaction Form and List */}
-          <div className="space-y-6">
-            <Tabs defaultValue="transactions" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="transactions" className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Transazioni Veloci
-                </TabsTrigger>
-                <TabsTrigger value="recurring" className="flex items-center gap-2">
-                  <RefreshCw className="h-4 w-4" />
-                  Pagamenti Ricorrenti
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="transactions" className="space-y-6">
+          </TabsContent>
+          
+          {/* Quick Transactions Tab */}
+          <TabsContent value="transactions" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
                 <TransactionForm onSuccess={handleTransactionSuccess} />
-                
+              </div>
+              <div>
                 <Card className="border-0 shadow-lg">
                   <CardHeader>
-                    <CardTitle>Transazioni Recenti</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-green-600" />
+                      Transazioni Recenti
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
                     <TransactionList key={refreshKey} />
                   </CardContent>
                 </Card>
-              </TabsContent>
-              
-              <TabsContent value="recurring">
-                <RecurringTransactionForm onSuccess={handleTransactionSuccess} />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+              </div>
+            </div>
+          </TabsContent>
+          
+          {/* Recurring Payments Tab */}
+          <TabsContent value="recurring" className="space-y-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                  Gestione Pagamenti Ricorrenti
+                </h2>
+                <p className="text-slate-600">
+                  Configura mutui, stipendi, bollette e altri pagamenti automatici
+                </p>
+              </div>
+              <RecurringTransactionForm onSuccess={handleTransactionSuccess} />
+            </div>
+          </TabsContent>
+          
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-purple-600" />
+                  Storico Completo Transazioni
+                </CardTitle>
+              </CardHeader>
+                             <CardContent className="p-0">
+                 <TransactionList key={refreshKey} />
+               </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
