@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown, Wallet, LogOut } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DollarSign, TrendingUp, TrendingDown, Wallet, LogOut, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FinancialChart from './FinancialChart';
 import TransactionList from './TransactionList';
 import TransactionForm from './TransactionForm';
+import RecurringTransactionForm from './RecurringTransactionForm';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -194,16 +196,35 @@ const Dashboard = () => {
 
           {/* Transaction Form and List */}
           <div className="space-y-6">
-            <TransactionForm onSuccess={handleTransactionSuccess} />
-            
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle>Transazioni Recenti</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <TransactionList key={refreshKey} />
-              </CardContent>
-            </Card>
+            <Tabs defaultValue="transactions" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="transactions" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Transazioni Veloci
+                </TabsTrigger>
+                <TabsTrigger value="recurring" className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Pagamenti Ricorrenti
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="transactions" className="space-y-6">
+                <TransactionForm onSuccess={handleTransactionSuccess} />
+                
+                <Card className="border-0 shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Transazioni Recenti</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <TransactionList key={refreshKey} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="recurring">
+                <RecurringTransactionForm onSuccess={handleTransactionSuccess} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
