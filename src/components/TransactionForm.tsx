@@ -138,10 +138,10 @@ const TransactionForm = ({ onSuccess, onShowRecurring }: TransactionFormProps) =
           </TabsList>
 
           <TabsContent value={transactionType}>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Importo (€)
                   </label>
                   <Input
@@ -150,20 +150,21 @@ const TransactionForm = ({ onSuccess, onShowRecurring }: TransactionFormProps) =
                     placeholder="0.00"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    className="h-12 text-lg sm:h-10 sm:text-base"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Data
                   </label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Calendar className="absolute left-3 top-3 sm:top-2.5 h-4 w-4 text-gray-400" />
                     <Input
                       type="date"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 h-12 sm:h-10"
                       required
                     />
                   </div>
@@ -171,7 +172,7 @@ const TransactionForm = ({ onSuccess, onShowRecurring }: TransactionFormProps) =
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                   Descrizione
                 </label>
                 <SmartDescriptionInput
@@ -188,7 +189,7 @@ const TransactionForm = ({ onSuccess, onShowRecurring }: TransactionFormProps) =
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                   Categoria
                 </label>
                 <Select 
@@ -196,7 +197,7 @@ const TransactionForm = ({ onSuccess, onShowRecurring }: TransactionFormProps) =
                   onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
                   required
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 sm:h-10">
                     <SelectValue placeholder="Seleziona una categoria" />
                   </SelectTrigger>
                   <SelectContent>
@@ -211,14 +212,28 @@ const TransactionForm = ({ onSuccess, onShowRecurring }: TransactionFormProps) =
 
               <Button 
                 type="submit" 
-                className={`w-full ${
+                className={`w-full h-12 sm:h-10 text-base sm:text-sm font-semibold ${
                   transactionType === 'income' 
                     ? 'bg-green-600 hover:bg-green-700' 
                     : 'bg-red-600 hover:bg-red-700'
                 }`}
                 disabled={loading}
               >
-                {loading ? 'Aggiunta...' : `Aggiungi ${transactionType === 'income' ? 'Entrata' : 'Uscita'}`}
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Aggiunta...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {transactionType === 'income' ? (
+                      <PlusCircle className="h-4 w-4" />
+                    ) : (
+                      <MinusCircle className="h-4 w-4" />
+                    )}
+                    Aggiungi {transactionType === 'income' ? 'Entrata' : 'Uscita'}
+                  </div>
+                )}
               </Button>
             </form>
 

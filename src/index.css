@@ -170,6 +170,53 @@
     background: linear-gradient(135deg, hsl(271 91% 35%) 0%, hsl(327 73% 35%) 100%);
   }
 
+  /* Ottimizzazioni Mobile */
+  @media (max-width: 640px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Touch targets ottimizzati */
+    .touch-target {
+      min-height: 48px;
+      min-width: 48px;
+    }
+    
+    /* Spacing migliorato per mobile */
+    .mobile-spacing {
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Font size responsive */
+    h1 {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+    
+    h2 {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+    
+    /* Card shadow ridotta su mobile */
+    .card {
+      box-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.1);
+    }
+  }
+  
+  /* iOS Safe Area */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .ios-safe-top {
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    .ios-safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+
   /* Animazioni dinamiche per le transazioni */
   .animate-fade-in {
     animation: fadeInUp 0.5s ease-out forwards;

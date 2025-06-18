@@ -12,7 +12,9 @@ import { ThemeToggle } from './theme/ThemeToggle';
 import AccountSettings from './AccountSettings';
 import DatabaseTest from './DatabaseTest';
 import FinancialAssistant from './FinancialAssistant';
+import MobileDashboard from './MobileDashboard';
 import { useAuth } from '@/hooks/useAuth';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Stats {
@@ -24,6 +26,7 @@ interface Stats {
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const isMobile = useIsMobile();
   const [stats, setStats] = useState<Stats>({
     totalBalance: 0,
     monthlyIncome: 0,
@@ -91,6 +94,11 @@ const Dashboard = () => {
   const handleTransactionSuccess = () => {
     setRefreshKey(prev => prev + 1);
   };
+
+  // Usa MobileDashboard per dispositivi mobili
+  if (isMobile) {
+    return <MobileDashboard onShowSettings={() => setShowSettings(true)} />;
+  }
 
   const statsData = [
     {
@@ -168,75 +176,78 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100">
-              Ciao, {user?.user_metadata?.full_name || user?.email}! 👋
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400 mt-1">
-              Ecco la panoramica delle tue finanze
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowDbTest(!showDbTest)}
-              className="hover:scale-105 transition-transform flex items-center gap-2"
-            >
-              <Database className="h-4 w-4" />
-              Test DB
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowSettings(!showSettings)}
-              className="hover:scale-105 transition-transform flex items-center gap-2"
-            >
-              <Settings className="h-4 w-4" />
-              Impostazioni
-            </Button>
-            <ThemeToggle />
-          <Button 
-            variant="outline" 
-            onClick={signOut}
-            className="hover:scale-105 transition-transform"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Esci
-          </Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-3 sm:p-4 md:p-6 ios-safe-top ios-safe-bottom">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        {/* Header - Mobile Ottimizzato */}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 truncate">
+                Ciao, {user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0]}! 👋
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm sm:text-base">
+                Ecco la panoramica delle tue finanze
+              </p>
+            </div>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowDbTest(!showDbTest)}
+                className="hover:scale-105 transition-transform flex items-center gap-2 whitespace-nowrap"
+              >
+                <Database className="h-4 w-4" />
+                <span className="hidden sm:inline">Test DB</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowSettings(!showSettings)}
+                className="hover:scale-105 transition-transform flex items-center gap-2 whitespace-nowrap"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Impostazioni</span>
+              </Button>
+              <ThemeToggle />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={signOut}
+                className="hover:scale-105 transition-transform whitespace-nowrap"
+              >
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Esci</span>
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {/* Stats Grid - Mobile Ottimizzata */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {statsData.map((stat, index) => (
             <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg dark:bg-slate-800 dark:border-slate-700">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+              <CardContent className="p-3 sm:p-4 md:p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-0">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 line-clamp-1">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                    <p className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100 truncate">
                       {stat.amount}
                     </p>
-                    <p className={`text-sm flex items-center mt-1 ${
+                    <p className={`text-xs sm:text-sm flex items-center mt-1 ${
                       stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {stat.trend === 'up' ? (
-                        <TrendingUp className="h-3 w-3 mr-1" />
+                        <TrendingUp className="h-3 w-3 mr-1 flex-shrink-0" />
                       ) : (
-                        <TrendingDown className="h-3 w-3 mr-1" />
+                        <TrendingDown className="h-3 w-3 mr-1 flex-shrink-0" />
                       )}
-                      {stat.change}
+                      <span className="truncate">{stat.change}</span>
                     </p>
                   </div>
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient} group-hover:scale-110 transition-transform`}>
-                    <stat.icon className="h-6 w-6 text-white" />
+                  <div className={`p-2 sm:p-3 rounded-xl bg-gradient-to-r ${stat.gradient} group-hover:scale-110 transition-transform self-end lg:self-auto`}>
+                    <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
                 </div>
               </CardContent>
@@ -244,28 +255,33 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - Mobile Ottimizzate */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 max-w-3xl mx-auto mb-8">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Panoramica
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 max-w-3xl mx-auto mb-8 h-auto">
+            <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2 text-xs sm:text-sm">
+              <DollarSign className="h-4 w-4 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Panoramica</span>
+              <span className="sm:hidden">Home</span>
             </TabsTrigger>
-            <TabsTrigger value="transactions" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Transazioni
+            <TabsTrigger value="transactions" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2 text-xs sm:text-sm">
+              <TrendingUp className="h-4 w-4 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Transazioni</span>
+              <span className="sm:hidden">Azioni</span>
             </TabsTrigger>
-            <TabsTrigger value="assistant" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              Assistente
+            <TabsTrigger value="assistant" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2 text-xs sm:text-sm">
+              <Brain className="h-4 w-4 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Assistente</span>
+              <span className="sm:hidden">AI</span>
             </TabsTrigger>
-            <TabsTrigger value="recurring" className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Ricorrenti
+            <TabsTrigger value="recurring" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2 text-xs sm:text-sm md:flex hidden md:inline-flex">
+              <RefreshCw className="h-4 w-4 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Ricorrenti</span>
+              <span className="sm:hidden">Fissi</span>
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <Wallet className="h-4 w-4" />
-              Cronologia
+            <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-3 px-2 text-xs sm:text-sm md:flex hidden md:inline-flex">
+              <Wallet className="h-4 w-4 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Cronologia</span>
+              <span className="sm:hidden">Storia</span>
             </TabsTrigger>
           </TabsList>
           
@@ -285,16 +301,16 @@ const Dashboard = () => {
           </TabsContent>
           
           {/* Quick Transactions Tab */}
-          <TabsContent value="transactions" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
+          <TabsContent value="transactions" className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="order-1 lg:order-1">
                 <TransactionForm onSuccess={handleTransactionSuccess} />
               </div>
-              <div>
+              <div className="order-2 lg:order-2">
                 <Card className="border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-green-600" />
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-xl">
+                      <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                       Transazioni Recenti
                     </CardTitle>
                   </CardHeader>
@@ -303,7 +319,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-          </div>
+            </div>
           </TabsContent>
           
           {/* Financial Assistant Tab */}
