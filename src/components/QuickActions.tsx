@@ -36,21 +36,21 @@ const QuickActions = () => {
           <Button
             key={index}
             variant="outline"
-            className="w-full justify-start h-auto p-4 hover:shadow-md transition-all duration-200 group border-border/50 hover:border-primary/30 hover:bg-muted/20 dark:hover:bg-muted/10"
+            className="w-full justify-start h-auto p-4 group border-border/50"
             onClick={action.action}
           >
-            <div className={`p-2 rounded-lg ${action.color} mr-3 group-hover:scale-110 transition-all duration-200 shadow-sm`}>
+            <div className={`p-2 rounded-lg ${action.color} mr-3 shadow-sm`}>
               <action.icon className="h-4 w-4 text-white" />
             </div>
             <div className="text-left flex-1">
-              <div className="font-medium text-foreground transition-colors">
+              <div className="font-medium text-foreground">
                 {action.title}
               </div>
               <div className="text-xs text-muted-foreground">
                 {action.description}
               </div>
             </div>
-            <div className="opacity-0 group-hover:opacity-100 transition-all duration-200">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
               <Sparkles className="h-4 w-4 text-primary" />
             </div>
           </Button>

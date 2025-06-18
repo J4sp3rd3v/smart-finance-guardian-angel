@@ -203,13 +203,13 @@ const TransactionList = () => {
         {transactions.map((transaction, index) => (
           <div
             key={transaction.id}
-            className="flex items-center gap-3 p-4 hover:bg-muted/30 dark:hover:bg-muted/10 transition-all duration-200 group rounded-lg border border-transparent hover:border-border/30 hover:shadow-sm animate-fade-in"
+            className="flex items-center gap-3 p-4 transition-all duration-200 group rounded-lg animate-fade-in"
             style={{
               animationDelay: `${index * 50}ms`
             }}
           >
             {/* Icon */}
-            <div className={`p-2 rounded-lg transition-transform group-hover:scale-110 ${
+            <div className={`p-2 rounded-lg ${
               transaction.type === 'income' 
                 ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20' 
                 : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
@@ -224,10 +224,10 @@ const TransactionList = () => {
             {/* Transaction Details */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <p className="font-medium text-foreground truncate transition-colors">
+                <p className="font-medium text-foreground truncate">
                   {transaction.description}
                 </p>
-                <p className={`font-semibold transition-all ${
+                <p className={`font-semibold ${
                   transaction.type === 'income' 
                     ? 'text-green-600 dark:text-green-400' 
                     : 'text-red-600 dark:text-red-400'
@@ -252,12 +252,12 @@ const TransactionList = () => {
             </div>
 
             {/* Actions */}
-            <div className="opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-1">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => startEdit(transaction)}
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
+                className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
               >
                 <Edit className="h-4 w-4" />
               </Button>
@@ -265,7 +265,7 @@ const TransactionList = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => deleteTransaction(transaction.id)}
-                className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
