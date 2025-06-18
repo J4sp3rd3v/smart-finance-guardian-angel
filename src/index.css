@@ -169,4 +169,57 @@
   .dark .gradient-card-purple {
     background: linear-gradient(135deg, hsl(271 91% 35%) 0%, hsl(327 73% 35%) 100%);
   }
+
+  /* Animazioni dinamiche per le transazioni */
+  .animate-fade-in {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Effetti hover migliorati */
+  .group:hover .transaction-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  /* Transizioni fluide per modali */
+  .modal-overlay {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .modal-content {
+    animation: slideInScale 0.3s ease-out;
+  }
+
+  @keyframes slideInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Smooth pulse per loading states */
+  .loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
 }
