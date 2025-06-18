@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, ArrowDownLeft, Trash2, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -97,7 +96,7 @@ const TransactionList = () => {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
+          <div key={i} className="animate-pulse bg-muted h-16 rounded-lg"></div>
         ))}
       </div>
     );
@@ -105,7 +104,7 @@ const TransactionList = () => {
 
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-muted-foreground">
         <p>Nessuna transazione ancora.</p>
         <p className="text-sm">Aggiungi la tua prima entrata o uscita!</p>
       </div>
@@ -117,13 +116,13 @@ const TransactionList = () => {
       {transactions.map((transaction) => (
         <div
           key={transaction.id}
-          className="flex items-center gap-3 p-4 hover:bg-slate-50 transition-colors group"
+          className="flex items-center gap-3 p-4 hover:bg-muted/50 dark:hover:bg-muted/20 transition-colors group rounded-lg"
         >
           {/* Amount */}
           <div className={`p-2 rounded-lg ${
             transaction.type === 'income' 
-              ? 'text-green-600' 
-              : 'text-red-600'
+              ? 'text-green-600 dark:text-green-400' 
+              : 'text-red-600 dark:text-red-400'
           }`}>
             {transaction.type === 'income' ? (
               <ArrowUpRight className="h-4 w-4" />
@@ -135,22 +134,22 @@ const TransactionList = () => {
           {/* Transaction Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <p className="font-medium text-slate-900 truncate">
+              <p className="font-medium text-foreground truncate">
                 {transaction.description}
               </p>
               <p className={`font-semibold ${
                 transaction.type === 'income' 
-                  ? 'text-green-600' 
-                  : 'text-red-600'
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
               }`}>
                 {formatAmount(transaction.amount, transaction.type)}
               </p>
             </div>
             <div className="flex items-center justify-between mt-1">
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 {transaction.categories.name}
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 {formatDate(transaction.date)}
               </p>
             </div>
@@ -162,7 +161,7 @@ const TransactionList = () => {
               variant="ghost"
               size="sm"
               onClick={() => deleteTransaction(transaction.id)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
             >
               <Trash2 className="h-4 w-4" />
             </Button>

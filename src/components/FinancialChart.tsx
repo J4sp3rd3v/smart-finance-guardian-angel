@@ -122,7 +122,7 @@ const FinancialChart = () => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 border border-slate-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-slate-900 mb-2">{label}</p>
+                          <p className="font-semibold text-foreground mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name === 'income' ? 'Entrate' : 
@@ -140,7 +140,7 @@ const FinancialChart = () => {
       <div className="h-80 w-full flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-slate-600 text-sm">Caricamento dati...</p>
+          <p className="text-muted-foreground text-sm">Caricamento dati...</p>
         </div>
       </div>
     );
@@ -267,11 +267,11 @@ const FinancialChart = () => {
       <div className="flex items-center justify-center gap-6 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-          <span className="text-slate-600">Entrate</span>
+                          <span className="text-muted-foreground">Entrate</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-          <span className="text-slate-600">Uscite</span>
+                          <span className="text-muted-foreground">Uscite</span>
         </div>
       </div>
 
@@ -281,19 +281,19 @@ const FinancialChart = () => {
           <h4 className="text-sm font-medium text-slate-700 mb-2">Riepilogo Periodo</h4>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-xs text-slate-500">Entrate Totali</p>
+                              <p className="text-xs text-muted-foreground">Entrate Totali</p>
               <p className="text-lg font-semibold text-green-600">
                 €{data.reduce((sum, item) => sum + item.income, 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Uscite Totali</p>
+                              <p className="text-xs text-muted-foreground">Uscite Totali</p>
               <p className="text-lg font-semibold text-red-600">
                 €{data.reduce((sum, item) => sum + item.expenses, 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Bilancio</p>
+                              <p className="text-xs text-muted-foreground">Bilancio</p>
               <p className={`text-lg font-semibold ${data.reduce((sum, item) => sum + item.balance, 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 €{data.reduce((sum, item) => sum + item.balance, 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
               </p>
@@ -303,7 +303,7 @@ const FinancialChart = () => {
       )}
       
       {data.length === 1 && data[0].name === 'Nessun Dato' && (
-        <div className="text-center py-8 text-slate-500">
+        <div className="text-center py-8 text-muted-foreground">
           <p className="text-lg mb-2">📊 Nessuna transazione trovata</p>
           <p className="text-sm">Inizia ad aggiungere transazioni per vedere i tuoi dati finanziari qui!</p>
         </div>

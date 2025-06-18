@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,14 +41,14 @@ const QuickActions = () => {
               <action.icon className="h-4 w-4 text-white" />
             </div>
             <div className="text-left">
-              <div className="font-medium text-slate-900">{action.title}</div>
-              <div className="text-xs text-slate-500">{action.description}</div>
+              <div className="font-medium text-foreground">{action.title}</div>
+              <div className="text-xs text-muted-foreground">{action.description}</div>
             </div>
           </Button>
         ))}
         
         <div className="pt-4 border-t border-slate-100">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Receipt className="h-4 w-4" />
             <span>Funzioni future</span>
           </div>
