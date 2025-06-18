@@ -203,7 +203,7 @@ const TransactionList = () => {
         {transactions.map((transaction, index) => (
           <div
             key={transaction.id}
-            className="flex items-center gap-3 p-4 hover:bg-muted/50 dark:hover:bg-muted/20 transition-all duration-200 group rounded-lg border border-transparent hover:border-border/50 hover:shadow-sm animate-fade-in"
+            className="flex items-center gap-3 p-4 hover:bg-muted/30 dark:hover:bg-muted/10 transition-all duration-200 group rounded-lg border border-transparent hover:border-border/30 hover:shadow-sm animate-fade-in"
             style={{
               animationDelay: `${index * 50}ms`
             }}
@@ -224,7 +224,7 @@ const TransactionList = () => {
             {/* Transaction Details */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <p className="font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                <p className="font-medium text-foreground truncate transition-colors">
                   {transaction.description}
                 </p>
                 <p className={`font-semibold transition-all ${

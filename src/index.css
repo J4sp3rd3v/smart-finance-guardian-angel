@@ -70,7 +70,7 @@
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 84.9%;
+    --muted-foreground: 240 5% 74.9%;
 
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
@@ -120,11 +120,11 @@
   }
 
   .dark .text-muted-foreground {
-    color: hsl(240 5% 84.9%);
+    color: hsl(240 5% 74.9%);
   }
 
   .dark .text-slate-600 {
-    color: hsl(240 5% 84.9%) !important;
+    color: hsl(240 5% 74.9%) !important;
   }
 
   .dark .text-slate-400 {
