@@ -180,7 +180,7 @@ const TransactionList = () => {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse bg-muted h-16 rounded-lg"></div>
+          <div key={i} className="animate-pulse bg-slate-200 dark:bg-slate-700 h-16 rounded-lg"></div>
         ))}  
       </div>
     );
@@ -188,9 +188,9 @@ const TransactionList = () => {
 
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <p>Nessuna transazione ancora.</p>
-        <p className="text-sm">Aggiungi la tua prima entrata o uscita!</p>
+      <div className="text-center py-8">
+        <p className="text-slate-500 dark:text-slate-400">Nessuna transazione ancora.</p>
+        <p className="text-sm text-slate-400 dark:text-slate-500">Aggiungi la tua prima entrata o uscita!</p>
       </div>
     );
   }
@@ -203,7 +203,7 @@ const TransactionList = () => {
         {transactions.map((transaction, index) => (
           <div
             key={transaction.id}
-            className="flex items-center gap-3 p-4 transition-all duration-200 group rounded-lg animate-fade-in"
+            className="flex items-center gap-3 p-4 rounded-lg group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
             style={{
               animationDelay: `${index * 50}ms`
             }}
@@ -211,8 +211,8 @@ const TransactionList = () => {
             {/* Icon */}
             <div className={`p-2 rounded-lg ${
               transaction.type === 'income' 
-                ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20' 
-                : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
+                ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30' 
+                : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30'
             }`}>
               {transaction.type === 'income' ? (
                 <ArrowUpRight className="h-4 w-4" />
@@ -224,7 +224,7 @@ const TransactionList = () => {
             {/* Transaction Details */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <p className="font-medium text-foreground truncate">
+                <p className="font-medium text-slate-900 dark:text-white truncate">
                   {transaction.description}
                 </p>
                 <p className={`font-semibold ${
@@ -241,11 +241,11 @@ const TransactionList = () => {
                     className="w-2 h-2 rounded-full" 
                     style={{ backgroundColor: transaction.categories.color }}
                   ></div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {transaction.categories.name}
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-slate-400 dark:text-slate-500">
                   {formatDate(transaction.date)}
                 </p>
               </div>
@@ -257,7 +257,7 @@ const TransactionList = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => startEdit(transaction)}
-                className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30"
               >
                 <Edit className="h-4 w-4" />
               </Button>
@@ -265,7 +265,7 @@ const TransactionList = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => deleteTransaction(transaction.id)}
-                className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -287,7 +287,7 @@ const TransactionList = () => {
           <div className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
                   Importo (€)
                 </label>
                 <Input
@@ -295,43 +295,40 @@ const TransactionList = () => {
                   step="0.01"
                   value={editForm.amount}
                   onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
-                  className="transition-all focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
                   Data
                 </label>
                 <Input
                   type="date"
                   value={editForm.date}
                   onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                  className="transition-all focus:ring-2 focus:ring-primary/20"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-1 block">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
                 Descrizione
               </label>
               <Input
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                 placeholder="Descrizione della transazione"
-                className="transition-all focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-1 block">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
                 Categoria
               </label>
               <Select 
                 value={editForm.category_id} 
                 onValueChange={(value) => setEditForm({ ...editForm, category_id: value })}
               >
-                <SelectTrigger className="transition-all focus:ring-2 focus:ring-primary/20">
+                <SelectTrigger>
                   <SelectValue placeholder="Seleziona categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -350,7 +347,7 @@ const TransactionList = () => {
             <div className="flex gap-2 pt-4">
               <Button 
                 onClick={updateTransaction}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 transition-all"
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
               >
                 <Save className="h-4 w-4 mr-2" />
                 Salva Modifiche
@@ -358,7 +355,6 @@ const TransactionList = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setIsEditModalOpen(false)}
-                className="transition-all"
               >
                 <X className="h-4 w-4 mr-2" />
                 Annulla
