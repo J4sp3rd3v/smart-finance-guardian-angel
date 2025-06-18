@@ -30,11 +30,11 @@ interface RecurringTransaction {
   category?: Category;
 }
 
-interface RecurringTransactionFormProps {
+interface RecurringTransactionMobileProps {
   onSuccess: () => void;
 }
 
-const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) => {
+const RecurringTransactionMobile = ({ onSuccess }: RecurringTransactionMobileProps) => {
   const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
@@ -77,7 +77,6 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
     if (!user) return;
     
     try {
-      // Prima verifichiamo se la tabella esiste facendo una query semplice
       const { data, error } = await supabase
         .from('recurring_transactions')
         .select('*')
@@ -86,7 +85,6 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
 
       if (error) {
         console.error('Errore nel fetch delle transazioni ricorrenti:', error);
-        // Se la tabella non esiste, aggiorniamo lo stato
         if (error.code === 'PGRST116' || error.message.includes('does not exist')) {
           setTableExists(false);
           return;
@@ -97,7 +95,6 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
 
       setTableExists(true);
 
-      // Se la query base funziona, facciamo la query completa con le categorie
       const { data: fullData, error: fullError } = await supabase
         .from('recurring_transactions')
         .select(`
@@ -109,7 +106,6 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
 
       if (fullError) {
         console.error('Errore nel fetch completo:', fullError);
-        // Fallback: usiamo solo i dati base senza le categorie
         const { data: basicData, error: basicError } = await supabase
           .from('recurring_transactions')
           .select('*')
@@ -188,7 +184,6 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
         description: `${transactionType === 'income' ? 'Entrata' : 'Uscita'} ricorrente di €${formData.amount} ${editingTransaction ? 'modificata' : 'aggiunta'} con successo`,
       });
 
-      // Reset form
       setFormData({
         amount: '',
         description: '',
@@ -261,7 +256,7 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
           </div>
         )}
 
-        {/* Contenuto principale - mostrato solo se la tabella esiste */}
+        {/* Contenuto principale */}
         {tableExists !== false && (
           <>
             {/* iOS-style Segmented Control */}
@@ -274,9 +269,9 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
                     setEditingTransaction(null);
                   }}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                         transactionType === 'expense'
-                       ? 'bg-red-500 text-white shadow-lg transform scale-95'
-                       : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
+                    transactionType === 'expense'
+                      ? 'bg-red-500 text-white shadow-lg transform scale-95'
+                      : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
                   }`}
                 >
                   <MinusCircle className="h-4 w-4 mx-auto mb-1" />
@@ -289,9 +284,9 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
                     setEditingTransaction(null);
                   }}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                         transactionType === 'income'
-                       ? 'bg-green-500 text-white shadow-lg transform scale-95'
-                       : 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
+                    transactionType === 'income'
+                      ? 'bg-green-500 text-white shadow-lg transform scale-95'
+                      : 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
                   }`}
                 >
                   <PlusCircle className="h-4 w-4 mx-auto mb-1" />
@@ -472,7 +467,7 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
                   <Button 
                     type="submit" 
                     disabled={loading} 
-                                         className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-medium shadow-lg transform transition-all duration-200 active:scale-95"
+                    className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-medium shadow-lg transform transition-all duration-200 active:scale-95"
                   >
                     {loading ? 'Salvando...' : (editingTransaction ? 'Modifica' : 'Aggiungi')}
                   </Button>
@@ -516,7 +511,7 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
                   {filteredRecurringTransactions.map((transaction) => (
                     <div 
                       key={transaction.id} 
-                                             className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-4 shadow-sm border transition-all duration-200 active:scale-95 ${
+                      className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl p-4 shadow-sm border transition-all duration-200 active:scale-95 ${
                         transaction.is_active 
                           ? 'border-green-200/50 dark:border-green-700/50' 
                           : 'border-slate-200/50 dark:border-slate-700/50'
@@ -642,4 +637,4 @@ const RecurringTransactionForm = ({ onSuccess }: RecurringTransactionFormProps) 
   );
 };
 
-export default RecurringTransactionForm; 
+export default RecurringTransactionMobile;
