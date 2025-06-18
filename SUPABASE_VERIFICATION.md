@@ -252,3 +252,225 @@ Basato sulla configurazione attuale:
 4. **Monitora errori** nella console Supabase
 
 Per supporto aggiuntivo, controlla i logs in Supabase Dashboard → Logs. 
+
+# 🔧 Guida Verifica Configurazione Supabase
+
+## ✅ Test Automatico - Usa il Componente DatabaseTest
+
+Nel dashboard della tua app, clicca sul bottone **"Test DB"** per verificare automaticamente:
+- Connessione database
+- Presenza tabelle
+- Funzioni SQL
+- Audit trail
+- Performance
+- Vista dashboard
+
+---
+
+## 🚨 **RISOLVI ERRORI TEST** 
+
+### Errori Comuni e Soluzioni
+
+**❌ Funzione `calculate_daily_statistics` non trovata**
+**❌ Vista `user_dashboard_summary` non implementata** 
+**❌ Audit Trail non configurato**
+
+### 🔥 SOLUZIONE RAPIDA (2 minuti)
+
+1. Vai su **Supabase Dashboard → SQL Editor**
+2. Copia il contenuto di `sql-steps/QUICK_FIX.sql`
+3. Incolla e clicca **"Run"**
+4. Testa di nuovo l'app
+
+### 🎯 SOLUZIONE COMPLETA (5 minuti)
+
+1. Vai su **Supabase Dashboard → SQL Editor**
+2. Copia il contenuto di `sql-steps/FIX_DATABASE_COMPLETE.sql`
+3. Incolla e clicca **"Run"**
+4. Vedrai messaggi di conferma nel log
+5. Testa di nuovo l'app
+
+---
+
+## 📋 Checklist Configurazione Base
+
+### 1️⃣ **Variabili d'Ambiente** (.env.local)
+```bash
+VITE_SUPABASE_URL=https://tuo-progetto.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+```
+
+### 2️⃣ **Client Supabase** (src/integrations/supabase/client.ts)
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+```
+
+### 3️⃣ **Autenticazione Configurata**
+- [x] Email/Password abilitato
+- [x] Conferma email disabilitata (per sviluppo)
+- [x] RLS (Row Level Security) abilitato
+
+### 4️⃣ **Tabelle Create**
+- [x] profiles
+- [x] categories  
+- [x] transactions
+- [x] recurring_transactions
+- [x] user_statistics
+- [x] audit_log (dopo fix)
+
+---
+
+## 🧪 Test Manuale SQL
+
+### Connessione Base
+```sql
+SELECT current_user, current_database(), version();
+```
+
+### Verifica Tabelle
+```sql
+SELECT table_name, table_type 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+ORDER BY table_name;
+```
+
+### Test Funzioni
+```sql
+-- Lista funzioni
+SELECT routine_name, routine_type 
+FROM information_schema.routines 
+WHERE routine_schema = 'public';
+
+-- Test calcolo statistiche
+SELECT public.calculate_daily_statistics(auth.uid());
+```
+
+### Test Audit Trail
+```sql
+-- Controlla se la tabella esiste
+SELECT * FROM public.audit_log LIMIT 1;
+
+-- Inserisci transazione di test
+INSERT INTO public.transactions (user_id, category_id, amount, description, type, date)
+VALUES (auth.uid(), (SELECT id FROM categories LIMIT 1), 10.00, 'Test audit', 'expense', CURRENT_DATE);
+
+-- Verifica audit creato
+SELECT * FROM public.audit_log WHERE user_id = auth.uid() ORDER BY created_at DESC LIMIT 1;
+```
+
+---
+
+## 🚀 Script Browser per Debug
+
+Apri **Developer Tools → Console** e incolla:
+
+```javascript
+// Test connessione
+const testConnection = async () => {
+  const { data, error } = await window.supabase.auth.getUser()
+  console.log('🔐 User:', data.user?.email || 'Non autenticato')
+  
+  if (error) {
+    console.error('❌ Auth Error:', error)
+    return
+  }
+}
+
+// Test tabelle
+const testTables = async () => {
+  const tables = ['profiles', 'categories', 'transactions', 'user_statistics', 'audit_log']
+  
+  for (const table of tables) {
+    const { data, error } = await window.supabase.from(table).select('*').limit(1)
+    console.log(`📊 ${table}:`, error ? '❌ ' + error.message : '✅ OK')
+  }
+}
+
+// Test funzioni
+const testFunctions = async () => {
+  const { data, error } = await window.supabase.rpc('calculate_daily_statistics', {
+    target_user_id: (await window.supabase.auth.getUser()).data.user.id
+  })
+  console.log('🧮 calculate_daily_statistics:', error ? '❌ ' + error.message : '✅ OK')
+}
+
+// Esegui tutti i test
+testConnection()
+testTables()
+testFunctions()
+```
+
+---
+
+## 🔍 Troubleshooting
+
+### Performance Lenta
+```sql
+-- Verifica indici
+SELECT indexname, tablename FROM pg_indexes WHERE schemaname = 'public';
+
+-- Crea indici mancanti
+CREATE INDEX IF NOT EXISTS idx_transactions_user_date ON transactions(user_id, date);
+CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category_id);
+```
+
+### RLS (Row Level Security)
+```sql
+-- Verifica policies
+SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual 
+FROM pg_policies WHERE schemaname = 'public';
+
+-- Policy base per transactions
+CREATE POLICY "Users can manage own transactions" ON transactions
+  FOR ALL USING (auth.uid() = user_id);
+```
+
+### Reset Completo Database
+```sql
+-- ⚠️ ATTENZIONE: Cancella tutti i dati!
+DROP TABLE IF EXISTS audit_log CASCADE;
+DROP TABLE IF EXISTS user_statistics CASCADE;
+DROP TABLE IF EXISTS recurring_transactions CASCADE;
+DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
+
+-- Poi esegui di nuovo le migrazioni
+```
+
+---
+
+## 📈 Monitoraggio 
+
+### Logs Supabase
+1. Dashboard → Logs → Postgres Logs
+2. Filtra per "ERROR" o "NOTICE"
+3. Monitora query lente (>100ms)
+
+### Metrics Utili
+- Connessioni attive
+- Query/secondo  
+- Storage utilizzato
+- Bandwidth utilizzato
+
+---
+
+## 🎯 Prossimi Passi
+
+Dopo aver risolto gli errori:
+
+1. **Testa l'app completamente**
+2. **Aggiungi dati di esempio**  
+3. **Configura backup automatici**
+4. **Imposta alerts di monitoraggio**
+5. **Documenta il deploy in produzione**
+
+---
+
+**💡 Tip:** Tieni sempre questa checklist aggiornata e usala per nuovi ambienti! 
