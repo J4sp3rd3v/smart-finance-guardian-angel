@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          id: string
+          table_name: string
+          record_id: string
+          user_id: string | null
+          action: string
+          old_data: Json | null
+          new_data: Json | null
+          changed_fields: string[] | null
+          ip_address: string | null
+          user_agent: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          table_name: string
+          record_id: string
+          user_id?: string | null
+          action: string
+          old_data?: Json | null
+          new_data?: Json | null
+          changed_fields?: string[] | null
+          ip_address?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          table_name?: string
+          record_id?: string
+          user_id?: string | null
+          action?: string
+          old_data?: Json | null
+          new_data?: Json | null
+          changed_fields?: string[] | null
+          ip_address?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string
@@ -167,12 +209,134 @@ export type Database = {
           },
         ]
       }
+      user_backup_metadata: {
+        Row: {
+          id: string
+          user_id: string
+          backup_type: string
+          file_path: string | null
+          file_size: number | null
+          checksum: string | null
+          records_count: number | null
+          status: string
+          error_message: string | null
+          created_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          backup_type: string
+          file_path?: string | null
+          file_size?: number | null
+          checksum?: string | null
+          records_count?: number | null
+          status?: string
+          error_message?: string | null
+          created_at?: string
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          backup_type?: string
+          file_path?: string | null
+          file_size?: number | null
+          checksum?: string | null
+          records_count?: number | null
+          status?: string
+          error_message?: string | null
+          created_at?: string
+          completed_at?: string | null
+        }
+        Relationships: []
+      }
+      user_statistics: {
+        Row: {
+          id: string
+          user_id: string
+          stat_date: string
+          total_transactions: number | null
+          total_income: number | null
+          total_expenses: number | null
+          net_balance: number | null
+          average_daily_spend: number | null
+          top_category_expense: string | null
+          monthly_budget: number | null
+          last_calculated: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          stat_date?: string
+          total_transactions?: number | null
+          total_income?: number | null
+          total_expenses?: number | null
+          net_balance?: number | null
+          average_daily_spend?: number | null
+          top_category_expense?: string | null
+          monthly_budget?: number | null
+          last_calculated?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          stat_date?: string
+          total_transactions?: number | null
+          total_income?: number | null
+          total_expenses?: number | null
+          net_balance?: number | null
+          average_daily_spend?: number | null
+          top_category_expense?: string | null
+          monthly_budget?: number | null
+          last_calculated?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      user_dashboard_summary: {
+        Row: {
+          user_id: string | null
+          full_name: string | null
+          email: string | null
+          current_month_income: number | null
+          current_month_expenses: number | null
+          current_month_balance: number | null
+          total_balance: number | null
+          total_transactions: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      calculate_daily_statistics: {
+        Args: {
+          target_user_id: string
+          target_date?: string
+        }
+        Returns: undefined
+      }
+      cleanup_old_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      delete_user_data: {
+        Args: {
+          target_user_id: string
+        }
+        Returns: boolean
+      }
+      export_user_data: {
+        Args: {
+          target_user_id: string
+        }
+        Returns: Json
+      }
+      process_recurring_transactions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

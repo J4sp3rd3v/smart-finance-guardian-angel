@@ -2,12 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, TrendingUp, TrendingDown, Wallet, LogOut, RefreshCw } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Wallet, LogOut, RefreshCw, Settings, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FinancialChart from './FinancialChart';
 import TransactionList from './TransactionList';
 import TransactionForm from './TransactionForm';
 import RecurringTransactionForm from './RecurringTransactionForm';
+import { ThemeToggle } from './theme/ThemeToggle';
+import AccountSettings from './AccountSettings';
+import DatabaseTest from './DatabaseTest';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -27,6 +30,8 @@ const Dashboard = () => {
     savingsRate: 0,
   });
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showDbTest, setShowDbTest] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -121,19 +126,79 @@ const Dashboard = () => {
     }
   ];
 
+  // Se showSettings è true, mostra solo le impostazioni
+  if (showSettings) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSettings(false)}
+              className="flex items-center gap-2"
+            >
+              ← Torna al Dashboard
+            </Button>
+          </div>
+          <AccountSettings />
+        </div>
+      </div>
+    );
+  }
+
+  // Se showDbTest è true, mostra test database
+  if (showDbTest) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDbTest(false)}
+              className="flex items-center gap-2"
+            >
+              ← Torna al Dashboard
+            </Button>
+          </div>
+          <DatabaseTest />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100">
               Ciao, {user?.user_metadata?.full_name || user?.email}! 👋
             </h1>
-            <p className="text-slate-600 mt-1">
+            <p className="text-slate-600 dark:text-slate-400 mt-1">
               Ecco la panoramica delle tue finanze
             </p>
           </div>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowDbTest(!showDbTest)}
+              className="hover:scale-105 transition-transform flex items-center gap-2"
+            >
+              <Database className="h-4 w-4" />
+              Test DB
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowSettings(!showSettings)}
+              className="hover:scale-105 transition-transform flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Impostazioni
+            </Button>
+            <ThemeToggle />
           <Button 
             variant="outline" 
             onClick={signOut}
@@ -142,19 +207,20 @@ const Dashboard = () => {
             <LogOut className="h-4 w-4 mr-2" />
             Esci
           </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {statsData.map((stat, index) => (
-            <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg">
+            <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg dark:bg-slate-800 dark:border-slate-700">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600 mb-1">
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                       {stat.amount}
                     </p>
                     <p className={`text-sm flex items-center mt-1 ${
@@ -232,7 +298,7 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+          </div>
           </TabsContent>
           
           {/* Recurring Payments Tab */}
@@ -259,9 +325,9 @@ const Dashboard = () => {
                   Storico Completo Transazioni
                 </CardTitle>
               </CardHeader>
-                             <CardContent className="p-0">
-                 <TransactionList key={refreshKey} />
-               </CardContent>
+              <CardContent className="p-0">
+                <TransactionList key={refreshKey} />
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
