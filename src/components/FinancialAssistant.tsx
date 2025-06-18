@@ -86,105 +86,144 @@ export default function FinancialAssistant() {
   };
 
   const loadGoals = async () => {
-    // Per ora utilizziamo dati mock, implementeremo Supabase dopo aver aggiornato le tabelle
-    const mockGoals: FinancialGoal[] = [
-      {
-        id: '1',
-        title: 'Fondo Emergenza',
-        target_amount: 5000,
-        current_amount: 2300,
-        deadline: '2024-12-31',
-        category: 'emergenza',
-        priority: 'high',
-        status: 'active'
-      },
-      {
-        id: '2',
-        title: 'Vacanze Estate',
-        target_amount: 2000,
-        current_amount: 800,
-        deadline: '2024-06-30',
-        category: 'svago',
-        priority: 'medium',
-        status: 'active'
-      },
-      {
-        id: '3',
-        title: 'Nuovo Laptop',
-        target_amount: 1500,
-        current_amount: 450,
-        deadline: '2024-03-31',
-        category: 'tecnologia',
-        priority: 'low',
-        status: 'active'
-      }
-    ];
-    setGoals(mockGoals);
+    // Carica obiettivi reali dal localStorage per ora (simulando persistenza)
+    const savedGoals = localStorage.getItem(`financial_goals_${user?.id}`);
+    if (savedGoals) {
+      setGoals(JSON.parse(savedGoals));
+    } else {
+      // Inizia con array vuoto se non ci sono obiettivi salvati
+      setGoals([]);
+    }
   };
 
   const analyzeSpendingPatterns = async () => {
-    // Analisi pattern di spesa basata su transazioni reali
-    const { data: transactions } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('user_id', user?.id)
-      .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+    try {
+      // Analisi pattern di spesa basata su transazioni reali
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('*, categories(name)')
+        .eq('user_id', user?.id)
+        .eq('type', 'expense')
+        .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
-    if (transactions) {
-      // Genera insights
-      const mockInsights: SpendingInsight[] = [
-        {
-          category: 'Alimentari',
-          amount: 450,
-          trend: 'up',
-          percentage_change: 15,
-          recommendation: 'Considera di pianificare i pasti per ridurre sprechi'
-        },
-        {
-          category: 'Trasporti',
-          amount: 280,
-          trend: 'down',
-          percentage_change: -8,
-          recommendation: 'Ottimo! Stai risparmiando sui trasporti'
-        },
-        {
-          category: 'Intrattenimento',
-          amount: 320,
-          trend: 'up',
-          percentage_change: 22,
-          recommendation: 'Spese per intrattenimento in aumento, considera un budget fisso'
-        }
-      ];
-      setInsights(mockInsights);
+      if (transactions && transactions.length > 0) {
+        // Raggruppa per categoria
+        const categorySpending = transactions.reduce((acc, transaction) => {
+          const categoryName = transaction.categories?.name || 'Altro';
+          if (!acc[categoryName]) {
+            acc[categoryName] = { total: 0, count: 0 };
+          }
+          acc[categoryName].total += transaction.amount;
+          acc[categoryName].count += 1;
+          return acc;
+        }, {} as Record<string, { total: number; count: number }>);
+
+        // Genera insights reali
+        const realInsights: SpendingInsight[] = Object.entries(categorySpending).map(([category, data]) => {
+          const avgAmount = data.total / data.count;
+          let trend: 'up' | 'down' | 'stable' = 'stable';
+          let recommendation = `Hai speso €${data.total.toFixed(2)} in ${category} questo mese.`;
+
+          // Logica semplificata per trend (puoi migliorarla)
+          if (data.total > 500) {
+            trend = 'up';
+            recommendation = `Spese elevate per ${category}. Considera di impostare un budget mensile.`;
+          } else if (data.total < 100) {
+            trend = 'down';
+            recommendation = `Spese contenute per ${category}. Ottimo controllo!`;
+          }
+
+          return {
+            category,
+            amount: data.total,
+            trend,
+            percentage_change: 0, // Calcolo semplificato per ora
+            recommendation
+          };
+        });
+
+        setInsights(realInsights);
+      } else {
+        // Se non ci sono transazioni, array vuoto
+        setInsights([]);
+      }
+    } catch (error) {
+      console.error('Errore analisi spese:', error);
+      setInsights([]);
     }
   };
 
   const generateSmartSuggestions = async () => {
-    const smartSuggestions: SmartSuggestion[] = [
-      {
-        id: '1',
-        type: 'tip',
-        title: 'Risparmio Automatico',
-        description: 'Imposta un trasferimento automatico di €100/mese verso il tuo fondo emergenza',
-        action: 'Configura',
-        priority: 1
-      },
-      {
-        id: '2',
-        type: 'warning',
-        title: 'Budget Superato',
-        description: 'Hai superato il budget mensile per "Intrattenimento" del 15%',
-        priority: 2
-      },
-      {
-        id: '3',
-        type: 'achievement',
-        title: 'Obiettivo Raggiunto!',
-        description: 'Complimenti! Hai risparmiato €200 in più rispetto al mese scorso',
-        priority: 3
+    try {
+      const suggestions: SmartSuggestion[] = [];
+      
+      // Ottieni statistiche dell'ultimo mese
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user?.id)
+        .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      if (transactions && transactions.length > 0) {
+        const totalExpenses = transactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + t.amount, 0);
+        
+        const totalIncome = transactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + t.amount, 0);
+
+        // Suggerimento basato su spese elevate
+        if (totalExpenses > 1000) {
+          suggestions.push({
+            id: 'high-spending',
+            type: 'warning',
+            title: 'Spese Elevate Rilevate',
+            description: `Hai speso €${totalExpenses.toFixed(2)} questo mese. Considera di rivedere il tuo budget.`,
+            priority: 1
+          });
+        }
+
+        // Suggerimento per risparmio positivo
+        if (totalIncome > totalExpenses) {
+          const savings = totalIncome - totalExpenses;
+          suggestions.push({
+            id: 'positive-savings',
+            type: 'achievement',
+            title: 'Ottimo Risparmio!',
+            description: `Hai risparmiato €${savings.toFixed(2)} questo mese. Considera di investire parte di questa somma.`,
+            priority: 2
+          });
+        }
+
+        // Suggerimento per poche transazioni
+        if (transactions.length < 5) {
+          suggestions.push({
+            id: 'track-more',
+            type: 'tip',
+            title: 'Traccia Più Transazioni',
+            description: 'Registra tutte le tue spese per avere analisi più accurate e consigli personalizzati.',
+            action: 'Aggiungi Transazione',
+            priority: 3
+          });
+        }
+      } else {
+        // Nessuna transazione - suggerimento per iniziare
+        suggestions.push({
+          id: 'get-started',
+          type: 'tip',
+          title: 'Inizia a Tracciare le Tue Finanze',
+          description: 'Aggiungi le tue prime transazioni per ricevere analisi personalizzate e consigli intelligenti.',
+          action: 'Aggiungi Prima Transazione',
+          priority: 1
+        });
       }
-    ];
-    setSuggestions(smartSuggestions);
+
+      setSuggestions(suggestions);
+    } catch (error) {
+      console.error('Errore generazione suggerimenti:', error);
+      setSuggestions([]);
+    }
   };
 
   const createGoal = async () => {
@@ -201,27 +240,23 @@ export default function FinancialAssistant() {
       status: 'active'
     };
 
-    // TODO: Salvare nel database quando le tabelle saranno create
-    // const { error } = await supabase
-    //   .from('financial_goals')
-    //   .insert([{
-    //     user_id: user?.id,
-    //     title: goal.title,
-    //     target_amount: goal.target_amount,
-    //     category: goal.category,
-    //     deadline: goal.deadline
-    //   }]);
-
-    setGoals([...goals, goal]);
+    // Salva nel localStorage per persistenza
+    const updatedGoals = [...goals, goal];
+    setGoals(updatedGoals);
+    localStorage.setItem(`financial_goals_${user?.id}`, JSON.stringify(updatedGoals));
+    
     setNewGoal({ title: '', target_amount: '', deadline: '', category: 'risparmio' });
   };
 
   const updateGoalProgress = async (goalId: string, amount: number) => {
-    setGoals(goals.map(goal => 
+    const updatedGoals = goals.map(goal => 
       goal.id === goalId 
         ? { ...goal, current_amount: Math.min(goal.current_amount + amount, goal.target_amount) }
         : goal
-    ));
+    );
+    setGoals(updatedGoals);
+    // Salva nel localStorage
+    localStorage.setItem(`financial_goals_${user?.id}`, JSON.stringify(updatedGoals));
   };
 
   const getSuggestionIcon = (type: string) => {
@@ -289,24 +324,36 @@ export default function FinancialAssistant() {
 
         <TabsContent value="suggestions" className="space-y-4">
           <div className="grid gap-4">
-            {suggestions.map((suggestion) => (
-              <Alert key={suggestion.id} className="border-l-4 border-l-primary">
-                <div className="flex items-start gap-3">
-                  {getSuggestionIcon(suggestion.type)}
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{suggestion.title}</h4>
-                    <AlertDescription className="mt-1">
-                      {suggestion.description}
-                    </AlertDescription>
-                    {suggestion.action && (
-                      <Button size="sm" className="mt-2">
-                        {suggestion.action}
-                      </Button>
-                    )}
+            {suggestions.length > 0 ? (
+              suggestions.map((suggestion) => (
+                <Alert key={suggestion.id} className="border-l-4 border-l-primary">
+                  <div className="flex items-start gap-3">
+                    {getSuggestionIcon(suggestion.type)}
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{suggestion.title}</h4>
+                      <AlertDescription className="mt-1">
+                        {suggestion.description}
+                      </AlertDescription>
+                      {suggestion.action && (
+                        <Button size="sm" className="mt-2">
+                          {suggestion.action}
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Alert>
-            ))}
+                </Alert>
+              ))
+            ) : (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center p-8 text-center">
+                  <Brain className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Nessun Consiglio Disponibile</h3>
+                  <p className="text-muted-foreground">
+                    Aggiungi alcune transazioni per ricevere consigli personalizzati sui tuoi pattern di spesa.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
 
@@ -319,7 +366,8 @@ export default function FinancialAssistant() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {goals.map((goal) => {
+              {goals.length > 0 ? (
+                goals.map((goal) => {
                 const progress = (goal.current_amount / goal.target_amount) * 100;
                 return (
                   <div key={goal.id} className="space-y-2 p-4 border rounded-lg">
@@ -358,7 +406,18 @@ export default function FinancialAssistant() {
                     </div>
                   </div>
                 );
-              })}
+              })
+              ) : (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center p-8 text-center">
+                    <Target className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Nessun Obiettivo Impostato</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Crea il tuo primo obiettivo finanziario per iniziare a tracciare i progressi.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
 
               <Card className="border-dashed">
                 <CardContent className="pt-6">
@@ -418,29 +477,41 @@ export default function FinancialAssistant() {
 
         <TabsContent value="insights" className="space-y-4">
           <div className="grid gap-4">
-            {insights.map((insight, index) => (
-              <Card key={index}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {getTrendIcon(insight.trend)}
-                      <div>
-                        <h4 className="font-semibold">{insight.category}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          €{insight.amount.toFixed(2)} questo mese
-                        </p>
+            {insights.length > 0 ? (
+              insights.map((insight, index) => (
+                <Card key={index}>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {getTrendIcon(insight.trend)}
+                        <div>
+                          <h4 className="font-semibold">{insight.category}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            €{insight.amount.toFixed(2)} questo mese
+                          </p>
+                        </div>
                       </div>
+                      <Badge variant={insight.trend === 'up' ? 'destructive' : 'default'}>
+                        {insight.percentage_change > 0 ? '+' : ''}{insight.percentage_change}%
+                      </Badge>
                     </div>
-                    <Badge variant={insight.trend === 'up' ? 'destructive' : 'default'}>
-                      {insight.percentage_change > 0 ? '+' : ''}{insight.percentage_change}%
-                    </Badge>
-                  </div>
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    {insight.recommendation}
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      {insight.recommendation}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center p-8 text-center">
+                  <BarChart3 className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Nessuna Analisi Disponibile</h3>
+                  <p className="text-muted-foreground">
+                    Registra alcune spese per vedere l'analisi dei tuoi pattern di consumo.
                   </p>
                 </CardContent>
               </Card>
-            ))}
+            )}
           </div>
         </TabsContent>
 
