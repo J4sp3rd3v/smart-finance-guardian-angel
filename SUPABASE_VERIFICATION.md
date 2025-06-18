@@ -1,6 +1,6 @@
 # 🛡️ Verifica Configurazione Supabase
 
-Questo documento ti guida per verificare che Supabase sia configurato correttamente per l'applicazione Smart Finance Guardian Angel.
+Questo documento ti guida per verificare che Supabase sia configurato correttamente per l'applicazione FinanceGuardian.
 
 ## 📋 Checklist Rapida
 

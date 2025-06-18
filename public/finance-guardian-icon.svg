@@ -1,0 +1,71 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FBBF24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dollarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" />
+  
+  <!-- Inner circle for depth -->
+  <circle cx="256" cy="256" r="200" fill="rgba(255,255,255,0.1)" />
+  
+  <!-- Shield symbol (protection/guardian) -->
+  <path d="M256 80 C200 80, 160 120, 160 180 L160 280 C160 360, 200 400, 256 432 C312 400, 352 360, 352 280 L352 180 C352 120, 312 80, 256 80 Z" fill="url(#shieldGradient)" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
+  
+  <!-- Dollar sign in the center -->
+  <g transform="translate(256, 256)">
+    <!-- Dollar symbol -->
+    <path d="M-20 -60 L20 -60 C35 -60, 45 -50, 45 -35 C45 -20, 35 -10, 20 -10 L-20 -10 C-35 -10, -45 0, -45 15 C-45 30, -35 40, -20 40 L20 40" 
+          stroke="url(#dollarGradient)" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <line x1="0" y1="-80" x2="0" y2="-60" stroke="url(#dollarGradient)" stroke-width="8" stroke-linecap="round"/>
+    <line x1="0" y1="40" x2="0" y2="60" stroke="url(#dollarGradient)" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Decorative elements - financial symbols -->
+  <!-- Chart line (top left) -->
+  <g transform="translate(120, 140)">
+    <polyline points="0,20 15,10 30,15 45,5" stroke="rgba(255,255,255,0.8)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="0" cy="20" r="3" fill="rgba(255,255,255,0.8)"/>
+    <circle cx="15" cy="10" r="3" fill="rgba(255,255,255,0.8)"/>
+    <circle cx="30" cy="15" r="3" fill="rgba(255,255,255,0.8)"/>
+    <circle cx="45" cy="5" r="3" fill="rgba(255,255,255,0.8)"/>
+  </g>
+  
+  <!-- Coins (top right) -->
+  <g transform="translate(350, 150)">
+    <circle cx="0" cy="0" r="12" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+    <circle cx="15" cy="8" r="10" fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+    <circle cx="8" cy="15" r="8" fill="rgba(255,255,255,0.5)" stroke="rgba(255,255,255,0.8)" stroke-width="2"/>
+  </g>
+  
+  <!-- Piggy bank silhouette (bottom left) -->
+  <g transform="translate(130, 360)">
+    <ellipse cx="20" cy="15" rx="25" ry="18" fill="rgba(255,255,255,0.3)"/>
+    <circle cx="35" cy="10" r="3" fill="rgba(255,255,255,0.4)"/>
+    <rect x="40" y="8" width="8" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>
+  </g>
+  
+  <!-- Credit card (bottom right) -->
+  <g transform="translate(340, 350)">
+    <rect x="0" y="0" width="40" height="25" rx="4" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+    <rect x="0" y="8" width="40" height="4" fill="rgba(255,255,255,0.5)"/>
+    <rect x="6" y="16" width="12" height="2" rx="1" fill="rgba(255,255,255,0.6)"/>
+  </g>
+  
+  <!-- Glow effect around shield -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+</svg> 

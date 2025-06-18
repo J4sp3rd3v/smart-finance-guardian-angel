@@ -1,4 +1,4 @@
-# 🗄️ Supabase Long-Term Setup - Smart Finance Guardian Angel
+# 🗄️ Supabase Long-Term Setup - FinanceGuardian
 
 ## 📋 **Panoramica Setup**
 

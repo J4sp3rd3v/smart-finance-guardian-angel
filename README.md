@@ -1,73 +1,106 @@
-# Welcome to your Lovable project
+# 🛡️ FinanceGuardian - Il Tuo Angelo Custode Finanziario
 
-## Project info
+![FinanceGuardian Logo](public/finance-guardian-icon.svg)
 
-**URL**: https://lovable.dev/projects/7716c8bf-e16d-419c-ab37-b9c3449264fd
+**FinanceGuardian** è un'applicazione moderna per la gestione delle finanze personali con design ottimizzato per iOS e intelligenza artificiale integrata.
 
-## How can I edit this code?
+## ✨ Caratteristiche Principali
 
-There are several ways of editing your application.
+- 📱 **Design iOS-Native**: Interfaccia ottimizzata per iOS 18 con glassmorphism e animazioni fluide
+- 🤖 **Assistente IA**: Consigli finanziari intelligenti e analisi automatiche delle spese
+- 🔄 **Pagamenti Ricorrenti**: Gestione automatica di mutui, stipendi, bollette e abbonamenti
+- 📊 **Dashboard Avanzata**: Visualizzazioni interattive delle tue finanze
+- 🌙 **Tema Scuro**: Supporto completo per tema scuro con colori bilanciati
+- 🔐 **Sicurezza**: Autenticazione sicura con Supabase e protezione dei dati
 
-**Use Lovable**
+## 🚀 Tecnologie Utilizzate
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7716c8bf-e16d-419c-ab37-b9c3449264fd) and start prompting.
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI Framework**: shadcn/ui + Tailwind CSS
+- **Backend**: Supabase (PostgreSQL + Auth + Storage)
+- **Grafici**: Recharts per visualizzazioni avanzate
+- **Animazioni**: Framer Motion + CSS Transforms
+- **Icons**: Lucide React
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📱 Funzionalità
 
-**Use your preferred IDE**
+### 💰 Gestione Transazioni
+- Aggiunta rapida di entrate e uscite
+- Categorizzazione automatica e intelligente
+- Descrizioni suggerite con IA
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 🔄 Pagamenti Ricorrenti
+- Configurazione mutui con durata personalizzata
+- Gestione stipendi e entrate fisse
+- Monitoraggio bollette e abbonamenti
+- Calcolo automatico rate e scadenze
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🎯 Assistente Finanziario
+- Analisi pattern di spesa
+- Consigli personalizzati per risparmiare
+- Obiettivi finanziari con tracking
+- Insights automatici sui comportamenti
 
-Follow these steps:
+### 📊 Dashboard Intelligente
+- Grafici interattivi delle spese
+- Bilancio mensile e annuale
+- Trend e previsioni
+- Statistiche dettagliate per categoria
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🛠️ Installazione e Sviluppo
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+# Clona il repository
+git clone https://github.com/your-username/finance-guardian.git
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Naviga nella directory
+cd finance-guardian
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Installa le dipendenze
+npm install
+
+# Avvia il server di sviluppo
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🔧 Configurazione
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Supabase Setup**: Configura il tuo progetto Supabase
+2. **Environment Variables**: Crea `.env.local` con le tue chiavi
+3. **Database**: Esegui gli script SQL in `sql-steps/`
 
-**Use GitHub Codespaces**
+## 📱 Design iOS
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+FinanceGuardian segue le **iOS Human Interface Guidelines** con:
 
-## What technologies are used for this project?
+- **Segmented Controls** nativi per navigazione
+- **Cards con glassmorphism** per profondità visiva
+- **Typography** ottimizzata per leggibilità
+- **Spacing** e **touch targets** iOS-compliant
+- **Animazioni** fluide con spring physics
+- **Bottom safe area** per device con notch
 
-This project is built with:
+## 🎨 Icona Personalizzata
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+L'icona di FinanceGuardian combina:
+- 🛡️ **Scudo** per protezione e sicurezza
+- 💲 **Simbolo del dollaro** per finanze
+- 📈 **Elementi grafici** per crescita
+- 🎨 **Gradient moderni** blue-to-purple
 
-## How can I deploy this project?
+## 🌟 Roadmap
 
-Simply open [Lovable](https://lovable.dev/projects/7716c8bf-e16d-419c-ab37-b9c3449264fd) and click on Share -> Publish.
+- [ ] App mobile nativa (React Native)
+- [ ] Integrazione banche italiane
+- [ ] Widget iOS per dashboard
+- [ ] Notifiche push intelligenti
+- [ ] Export dati avanzato
+- [ ] Modalità famiglia/condivisa
 
-## Can I connect a custom domain to my Lovable project?
+## 📄 Licenza
 
-Yes, you can!
+Questo progetto è rilasciato sotto licenza MIT.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+**Sviluppato con ❤️ per una gestione finanziaria più intelligente**
