@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, TrendingUp, TrendingDown, Wallet, LogOut, RefreshCw, Settings, Database } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Wallet, LogOut, RefreshCw, Settings, Database, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FinancialChart from './FinancialChart';
 import TransactionList from './TransactionList';
@@ -11,6 +11,7 @@ import RecurringTransactionForm from './RecurringTransactionForm';
 import { ThemeToggle } from './theme/ThemeToggle';
 import AccountSettings from './AccountSettings';
 import DatabaseTest from './DatabaseTest';
+import FinancialAssistant from './FinancialAssistant';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -245,7 +246,7 @@ const Dashboard = () => {
 
         {/* Navigation Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto mb-8">
+          <TabsList className="grid w-full grid-cols-5 max-w-3xl mx-auto mb-8">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
               Panoramica
@@ -253,6 +254,10 @@ const Dashboard = () => {
             <TabsTrigger value="transactions" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Transazioni
+            </TabsTrigger>
+            <TabsTrigger value="assistant" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Assistente
             </TabsTrigger>
             <TabsTrigger value="recurring" className="flex items-center gap-2">
               <RefreshCw className="h-4 w-4" />
@@ -299,6 +304,11 @@ const Dashboard = () => {
                 </Card>
               </div>
           </div>
+          </TabsContent>
+          
+          {/* Financial Assistant Tab */}
+          <TabsContent value="assistant" className="space-y-6">
+            <FinancialAssistant />
           </TabsContent>
           
           {/* Recurring Payments Tab */}
