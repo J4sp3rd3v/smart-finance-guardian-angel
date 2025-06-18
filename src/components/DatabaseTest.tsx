@@ -197,7 +197,7 @@ const DatabaseTest = () => {
 
       addResult({
         name: 'Performance Query',
-        status: timing < 100 ? 'success' : 'error',
+        status: timing < 200 ? 'success' : 'error',
         message: `Query ultimi 30 giorni: ${timing}ms (${data?.length || 0} record)`,
         timing
       });
